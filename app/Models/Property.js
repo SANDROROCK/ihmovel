@@ -26,7 +26,7 @@ class Property extends Model {
 
     return query
     .select('*',Database.raw(`${haversine} as distance`))
-    .whereRaw(`${haversine}< ${distance}`)
+    .whereRaw(`${haversine}< ${distance}`)  
     }
 
     

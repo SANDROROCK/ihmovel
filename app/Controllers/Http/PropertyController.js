@@ -21,9 +21,13 @@ class PropertyController {
    */
   async index ({ request, response, view }) {
 
-    const properties = Property.all()
+    const {latitude,longitude}= request.all()
+    const properties = Property.query()
+      .with('images')
+      .nearBy(latitude,longitude,10)
+      .fetch()
 
-    return propertie
+    return properties
   }
 
  
@@ -37,6 +41,17 @@ class PropertyController {
    * @param {Response} ctx.response
    */
   async store ({ request, response }) {
+    
+    const { id } = auth.user
+    const data = request.only([
+      'title',
+      'address',
+      'latitude',
+      'price'
+    ])
+    const property = await Property.create({...data,user_id:id})
+
+    return property
   }
 
   /**
@@ -66,6 +81,22 @@ class PropertyController {
    * @param {Response} ctx.response
    */
   async update ({ params, request, response }) {
+
+    const property = await Property.findOrFail(params.id)
+
+    const data = request.only([
+      'title',
+      'address',
+      'latitude',
+      'longitude',
+      'price'
+    ])
+
+    property.merge(data)
+
+    await property.save()
+
+    return property
   }
 
   /**
